@@ -128,5 +128,6 @@ Tested on:
 - ✅ Edge
 
 ---
-PS, I did not include the company's name in the README or the repository name to prevent it being seen and copied via a github search
+PS, I did not include the company's name in the README or the repository name to prevent it from being seen and copied via a GitHub search.
+Also, I added a tweak on the mobile view for the search bar. The search icon remains visible at all times. Tapping it reveals the full search bar along with a close button, allowing users to search seamlessly from anywhere on the page, hence a better user experience.
 Happy coding! ✌️
