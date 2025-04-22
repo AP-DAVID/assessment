@@ -128,5 +128,5 @@ Tested on:
 - ✅ Edge
 
 ---
-
+PS, I did not include the company's name in the README or the repository name to prevent it being seen and copied via a github search
 Happy coding! ✌️
