@@ -246,7 +246,7 @@ export function QuickTransfer() {
                     inputMode="decimal"
                     value={amount}
                     onChange={handleAmountChange}
-                    className={`h-10 sm:h-11 md:h-12 lg:h-10 xl:h-11 bg-gray-100 border-0 rounded-full pr-[80px] sm:pr-[130px] lg:pr-[110px] text-sm sm:text-base lg:text-sm ${amountError ? "border border-red-500" : ""
+                    className={`h-10 sm:h-11 md:h-12 lg:h-10 text-[16px] xl:h-11 bg-gray-100 border-0 rounded-full pr-[80px] sm:pr-[130px] lg:pr-[110px] sm:text-base lg:text-sm ${amountError ? "border border-red-500" : ""
                       }`}
                     placeholder="0.00"
                     aria-label="Transfer amount"
