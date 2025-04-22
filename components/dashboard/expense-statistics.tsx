@@ -27,65 +27,68 @@ export function ExpenseStatistics() {
   }, [])
 
   // 🎨 Build / rebuild the pie chart
-  useEffect(() => {
-    if (!isLoading && chartRef.current && expenseCategories.length) {
-      // 🔥 Destroy any old chart
-      chartInstance.current?.destroy()
+useEffect(() => {
+  if (!isLoading && chartRef.current && expenseCategories.length) {
+    // 🔥 Destroy any old chart
+    chartInstance.current?.destroy()
 
-      const ctx = chartRef.current.getContext("2d")
-      if (!ctx) return
+    const ctx = chartRef.current.getContext("2d")
+    if (!ctx) return
 
-      const data = expenseCategories.map((c) => c.percentage)
-      const labels = expenseCategories.map((c) => c.category)
-      const colors = expenseCategories.map((c) => c.color)
+    const data = expenseCategories.map((c) => c.percentage)
+    const labels = expenseCategories.map((c) => c.category)
+    const colors = expenseCategories.map((c) => c.color)
 
-      chartInstance.current = new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels,
-          datasets: [
-            {
-              data,
-              backgroundColor: colors,
-              borderColor: "#fff", // white gaps
-              borderWidth: 4,      // gap thickness
-              spacing: 4,          // pad between arcs
+    chartInstance.current = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels,
+        datasets: [
+          {
+            data,
+            backgroundColor: colors,
+            borderColor: "#fff",
+            borderWidth: 4,
+            spacing: 4,
+          },
+        ],
+      },
+      plugins: [ChartDataLabels],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true },
+          datalabels: {
+            color: "#fff",
+            font: { weight: "bold", size: isMobile ? 10 : 12 },
+            formatter: (value, ctx) => {
+              const idx = ctx.dataIndex
+              const cat = ctx.chart.data.labels![idx]
+              return `${value}%\n${cat}`
             },
-          ],
-        },
-        plugins: [ChartDataLabels],
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: true },
-            datalabels: {
-              color: "#fff",
-              font: { weight: "bold", size: isMobile ? 10 : 12 },
-              formatter: (value, ctx) => {
-                const idx = ctx.dataIndex
-                const cat = ctx.chart.data.labels![idx]
-                return `${value}%\n${cat}`
-              },
-              anchor: "center",
-              align: "center",
-
-              offset: -10,
-              clamp: true,
-              clip: true,
-              padding: 20,
-            },
+            anchor: "center",
+            align: "center",
+            offset: -10,
+            clamp: true,
+            clip: true,
+            padding: 20,
           },
         },
-      })
-    }
+      },
+    })
 
-    // 🧼 Cleanup on unmount or deps change
-    return () => {
-      chartInstance.current?.destroy()
-    }
-  }, [isLoading, expenseCategories, isMobile])
+    // 🧠 Force resize once layout is truly done
+    setTimeout(() => {
+      chartInstance.current?.resize()
+    }, 250)
+  }
+
+  return () => {
+    chartInstance.current?.destroy()
+  }
+}, [isLoading, expenseCategories, isMobile])
 
   return (
     <div className="w-full space-y-2">
@@ -101,10 +104,11 @@ export function ExpenseStatistics() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="relative h-[250px] sm:h-[300px] w-full">
+            <div className="relative h-[250px] sm:h-[300px] w-full min-w-0">
               <canvas
                 ref={chartRef}
                 height={chartHeight}
+                   width="100%"
                 role="img"
                 aria-label="Pie chart showing expense distribution by category"
               />
