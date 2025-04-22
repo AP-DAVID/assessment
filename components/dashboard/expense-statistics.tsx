@@ -1,51 +1,19 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useDashboard } from "@/context/dashboard-context"
 import { Card, CardContent } from "@/components/ui/card"
 import Chart from "chart.js/auto"
 import ChartDataLabels from "chartjs-plugin-datalabels"
 import { Loader2 } from "lucide-react"
-import { useMobile } from "@/hooks/use-mobile"
 
 export function ExpenseStatistics() {
   const { expenseCategories, isLoading } = useDashboard()
   const chartRef = useRef<HTMLCanvasElement>(null)
   const chartInstance = useRef<Chart | null>(null)
-  const isMobile = useMobile()
 
-  const [chartHeight, setChartHeight] = useState(300)
-  const [isLayoutReady, setIsLayoutReady] = useState(false)
-
-  // Handle chart height based on screen width
   useEffect(() => {
-    function handleResize() {
-      const w = chartRef.current?.parentElement?.clientWidth ?? 0
-      setChartHeight(w < 300 ? 200 : w < 400 ? 220 : 300)
-    }
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  // Wait for layout to fully stabilize before rendering chart
-  useEffect(() => {
-    let prevWidth = 0
-    const checkInterval = setInterval(() => {
-      const currentWidth = chartRef.current?.parentElement?.clientWidth ?? 0
-      if (currentWidth && currentWidth === prevWidth) {
-        clearInterval(checkInterval)
-        setIsLayoutReady(true)
-      }
-      prevWidth = currentWidth
-    }, 100)
-
-    return () => clearInterval(checkInterval)
-  }, [])
-
-  // Build pie chart once data and layout are ready
-  useEffect(() => {
-    if (!isLoading && isLayoutReady && chartRef.current && expenseCategories.length) {
+    if (!isLoading && chartRef.current && expenseCategories.length) {
       chartInstance.current?.destroy()
 
       const ctx = chartRef.current.getContext("2d")
@@ -78,7 +46,7 @@ export function ExpenseStatistics() {
             tooltip: { enabled: true },
             datalabels: {
               color: "#fff",
-              font: { weight: "bold", size: isMobile ? 10 : 12 },
+              font: { weight: "bold", size: 12 },
               formatter: (value, ctx) => {
                 const idx = ctx.dataIndex
                 const cat = ctx.chart.data.labels![idx]
@@ -97,12 +65,12 @@ export function ExpenseStatistics() {
     }
 
     return () => chartInstance.current?.destroy()
-  }, [isLoading, isLayoutReady, expenseCategories, isMobile])
+  }, [isLoading, expenseCategories])
 
   return (
     <div className="w-full space-y-2">
       <div className="text-xl text-[#343C6A] font-semibold">Expense Statistics</div>
-      <Card className="w-full h-full bg-white rounded-lg">
+      <Card className="w-full bg-white rounded-lg">
         <CardContent>
           {isLoading ? (
             <div
@@ -113,12 +81,10 @@ export function ExpenseStatistics() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="relative h-[250px] sm:h-[300px] w-full min-w-0">
+            <div className="relative w-full h-[250px] sm:h-[300px]">
               <canvas
                 ref={chartRef}
-                height={chartHeight}
-                width="100%"
-                className="w-full"
+                className="w-full h-full"
                 role="img"
                 aria-label="Pie chart showing expense distribution by category"
               />
